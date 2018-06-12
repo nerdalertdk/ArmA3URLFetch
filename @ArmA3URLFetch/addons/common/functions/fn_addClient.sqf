@@ -17,20 +17,32 @@ params [
 	["_url", "", [""]],
 	["_method", "", [""]],
 	["_params", [], [[]]],
+	["_headers", [], [[]]],
 	["_decodeJson", false, [false]]
 ];
 
 if (_url == "") exitWith { 0; };
-if (_method == "") exitWith { 0; };
 
-_params pushBack format["#url=%1", _url];
-_params pushBack format["#method=%1", _method];
+private _args = [];
+_args append ["#url", _url];
+
+if (_method != "") then {
+	_args append ["#method", _method];
+};
+
+if ((count _params) > 0) then {
+	_args append _params;
+};
+
+if ((count _headers) > 0) then {
+	_args append _headers;
+};
 
 if (_decodeJson) then
 {
-	_params pushBack "#jsonToArray=true";
+	_args pushBack "#jsonToArray";
 };
 
 private _res = [];
-_res = ("arma3urlfetch" callExtension ["ADDCLI", _params]);
+_res = ("arma3urlfetch" callExtension ["ADDCLI", _args]);
 (parseNumber (_res select 0));
